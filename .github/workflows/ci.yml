@@ -38,7 +38,9 @@ jobs:
       - name: Show Node Version
         run: |
           echo "Node Version: ${{ vars.NODE_VERSION }}"
-
+      - name: Deploy API
+        run: |
+          echo "Deploying API with key: ${{ secrets.API_KEY }}"
       # Variables a nivel del step
       - name: Build
         run: npm run build
