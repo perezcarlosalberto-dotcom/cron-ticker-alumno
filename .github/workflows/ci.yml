@@ -13,40 +13,21 @@ env:
 
 jobs:
 
-  build:
-    name: Build
+  test:
+    name: Test en node matrix
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10, 20, 22]
+      fail-fast: false
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Setup Node Js ${{matrix.node-version}}
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{matrix.node-version}}
           cache: 'npm'
-
       - run: npm ci
-      - name: Build app
-        run: npm run build
-        env:
-          APP_VERSION: ${{ vars.APP_VERSION || '1.0.0' }}
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-${{ github.sha }}
-          path: dist/
-          retention-days: 7
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download build
-        uses: actions/download-artifact@v4
-        with:
-          name: build-${{ github.sha }}
-          path: dist/
-
-      - name: Deploy to server
-        run: |
-          echo "Deploying: $(cat dist/build-info.json)"
-          
+      - run: npm test
